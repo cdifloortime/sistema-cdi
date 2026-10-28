@@ -226,5 +226,9 @@ def users():
   pros=c.execute('SELECT * FROM professionals').fetchall();rows=c.execute('SELECT username,role FROM users').fetchall()
  return page('''<h2>Usuários e permissões</h2><div class="card"><form method="post"><label>Usuário</label><input name="username" required><label>Senha</label><input name="password" type="password" minlength="12" required><label>Perfil</label><select name="role"><option value="recepcao">Recepção</option><option value="terapeuta">Terapeuta</option><option value="financeiro">Financeiro</option><option value="admin">Administrador</option></select><label>Profissional vinculado (obrigatório para terapeuta)</label><select name="professional_id"><option value="">Nenhum</option>{% for p in pros %}<option value="{{p.id}}">{{p.name}}</option>{% endfor %}</select><button>Criar usuário</button></form></div><div class="card"><table><tr><th>Usuário</th><th>Perfil</th></tr>{% for r in rows %}<tr><td>{{r.username}}</td><td>{{r.role}}</td></tr>{% endfor %}</table></div>''',pros=pros,rows=rows)
 
+# Inicialização também ao importar o módulo pelo Gunicorn.
+# Não iniciar thread em cada worker Gunicorn: a reconciliação ocorre nas requisições.
+init()
+
 if __name__=='__main__':
- init();threading.Thread(target=timer_worker,daemon=True).start();app.run(host='127.0.0.1',port=int(os.environ.get('PORT',5000)),debug=False)
+ app.run(host='0.0.0.0',port=int(os.environ.get('PORT',5000)),debug=False)
